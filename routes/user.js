@@ -11,7 +11,7 @@ const {
 router.post(
   "/register",
   [
-    check("username", "Username is required").not().isEmpty(),
+    check("name", "name is required").not().isEmpty(),
     check("email", "Please include a valid email").isEmail(),
     check(
       "password",
@@ -41,6 +41,7 @@ router.post(
     loginUser(req, res);
   }
 );
+
 router.get("/profile", auth, getUserProfile);
 
 module.exports = router;
