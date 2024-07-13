@@ -1,14 +1,30 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const http = require("http");
 const dotenv = require("dotenv");
+const socketIo = require("socket.io");
 
 dotenv.config();
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('build'))
+io.on("connection", (socket) => {
+  console.log("New client connected");
+
+  socket.emit("notification", {
+    message: "New book recommendation available!",
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+  });
+});
 
 mongoose
   .connect(process.env.MONGODB_URI, {
@@ -23,7 +39,6 @@ const userRoutes = require("./routes/user");
 const profileRoutes = require("./routes/user");
 
 app.use("/api/users", userRoutes);
-// app.use("/api/books", bookRoutes);
 app.use("/api/users", profileRoutes);
 
 const PORT = process.env.PORT || 3003;
