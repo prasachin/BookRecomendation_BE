@@ -8,8 +8,6 @@ const socketIo = require("socket.io");
 dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server);
 
 app.use(cors());
 app.use(express.json());
@@ -20,6 +18,13 @@ app.use((req, res, next) => {
     "default-src 'self'; script-src 'self' 'unsafe-inline';"
   );
   next();
+});
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
 });
 
 io.on("connection", (socket) => {
@@ -42,6 +47,7 @@ mongoose
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.error(err));
 
+// Importing routes
 const userRoutes = require("./routes/user");
 const bookRoutes = require("./routes/book");
 const profileRoutes = require("./routes/user");
@@ -51,4 +57,4 @@ app.use("/api/users", profileRoutes);
 app.use("/api/books", bookRoutes);
 
 const PORT = process.env.PORT || 3003;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
